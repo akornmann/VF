@@ -1,64 +1,68 @@
-from numpy import *
-from Legendre import *
+from numpy import ones,zeros,linspace
+from Legendre import Legendre
 
 class Base:
-    
     #ordre : degre des polynomes de la base
     def __init__(self,ordre):
         self.ordre = ordre
         
         leg = Legendre(self.ordre)
-        self.w = leg.w()
-        self.x = leg.x()
-        
+        self.w = leg.weight()
+        self.x = leg.coord()
         return
     
-    #Produit des xi-xj (i!=j)
-    def pden(self, d):
-        res = 1
-        
-        for k in range(self.ordre):
-            if(k!=d):
-                res*=self.x[d]-self.x[k]
-        
-        return res
-    
     #base des phi
-    def phi(self,x,d):
-        res = 1
-        
-        for k in range(self.ordre):
-            if(k!=d):
-                res*=x-self.x[k]
-        
-        res/=self.pden(d)
-        
+    def phi(self,x):
+        res = ones((self.ordre,1))
+        for i in range(self.ordre) :
+            for j in range(self.ordre):
+                if j!=i:
+                    res[i]*=(x-self.x[j])/(self.x[i]-self.x[j]) 
         return res
     
     #derive de phi
-    def phiprime(self,x,d):
-        k=0
-        l=0
-        res=0
-        tmp=1
-        for k in range(self.ordre):
-            if k!=d:
-                for l in range(self.ordre):
-                    if l!=k:
-                        tmp*=x-self.x[l]
-                    l+=1
-                res+=tmp
-                tmp=1
-                l=0
-            k+=1
-
-        k=0
-        tmp=1
-        for j in range(self.ordre):
-            if k!=j:
-                tmp*= (self.x[j]-self.x[k])
-            j+=1
-        
-        res/=tmp
-        
+    def phip(self, x):
+        res = zeros(self.ordre)
+        for i in range(self.ordre):
+            div=1.
+            
+            for j in range(self.ordre):
+                if j!=i:
+                    div*=(self.x[i]-self.x[j])
+                    tmp=1.
+                    for k in range(self.ordre):
+                        if(k!=j and k!=i):
+                            tmp*=(x-self.x[k])
+                    res[i]+=tmp
+            res[i]/=div
         return res
+
+    #test unitaire
+    def unit(self):
+        import matplotlib.pyplot as plt
+        N=500
+        
+        x=linspace(-1,1,N)
+        y=zeros((N,self.ordre))
+        for k in range(N):
+            y[k] = self.phi(x[k]).T
+
+        plt.plot(x,y)
+
+        plt.title('phi')
+        plt.axis([-1,1,-5,5])
+        plt.grid()        
+        
+        plt.show()
+        
+        
+        for k in range(N):
+            y[k] = self.phip(x[k]).T
+
+        plt.plot(x,y)
+
+        plt.axis([-1,1,-5,5])
+        plt.title('phip') 
+        plt.grid()   
+        
+        plt.show()

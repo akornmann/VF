@@ -1,55 +1,50 @@
-from GD import *
-from Integration import *
-from Legendre import *
-from RK2 import *
-from animation import *
-
-ordre=3
-dx=0.01
-dt=dx/(2*(ordre+1))
-tmax=1.0
-a = -2.0
-b = 10.0
+from numpy import zeros,exp
+from GD import GD
+from RK2 import RK2
+from Animation import Animation
 
 
-omega = numpy.arange(a,b,dx)
-N = len(omega)
+'''
+def identity(W):
+    return W
 
-g = Integration(ordre,omega)
-l = Legendre(ordre)
-xa = l.x()
-W = arange(ordre*2*(N-1),dtype=float)
-W = W.reshape((N-1)*ordre,2)
+dt=0.001
+rk2 = RK2(dt,identity)
+rk2.unit()
+'''
+'''
+from Base import Base
+b = Base(3)
+b.unit()
+'''
 
-#Initialisation
-x=[]
-l=0
-while l<N-1:
-    for i in range(ordre):
-        xv=g.G(xa[i],l+1)
-        x.append(xv)
+N = 50
+ordre = 3
+a=0.
+b=2.
 
-        W[l*ordre+i][0] = exp(-xv*xv)
-        W[l*ordre+i][1] = exp(-xv*xv)
-    l+=1
+dt=((b-a)/N)/(2*(ordre+1))
+Tmax=2.
 
-r = RK2(ordre,W,omega)
+#Array 3D contenant la solution
+W = zeros((2,N,ordre))
 
-t=0
-W = r.Wp1(W, dt)
+galerkin = GD(ordre,a,b,N)
 
+rk2 = RK2(dt,galerkin.dW)
 
-anim = Animation(x,-1.5,1.5)
-while t<tmax:
-    #W = r.Wp1(W, dt)
-    t+=dt
-    l=[]
+x = galerkin.getX()
+
+anim = Animation(x,-10,10)
+
+while(rk2.t<Tmax):
+    def lim0():
+        we = zeros((2,1))
+        we[:,0] = [15*exp(-100.*(rk2.t-0.3)*(rk2.t-0.3)),0.]
+        return we
+    galerkin.Wexact0 = lim0  
     
-    i=0
-
-    while i<ordre*(N-1):
-        l.append(W[i].flat[1])
-        i+=1
-    anim.plot(l)
-
-        
+    W = rk2.Wp1(W)
+    y = galerkin.getY(W)
+    
+    anim.plot(y)
