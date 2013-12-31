@@ -2,7 +2,6 @@ from numpy import ones,zeros,linspace
 from Legendre import Legendre
 
 class Base:
-    #ordre : degre des polynomes de la base
     def __init__(self,ordre):
         self.ordre = ordre
         
@@ -39,7 +38,7 @@ class Base:
 
     #test unitaire
     def unit(self):
-        import matplotlib.pyplot as plt
+        from matplotlib.pyplot import plot,title,axis,grid,show
         N=500
         
         x=linspace(-1,1,N)
@@ -47,22 +46,21 @@ class Base:
         for k in range(N):
             y[k] = self.phi(x[k]).T
 
-        plt.plot(x,y)
+        plot(x,y)
 
-        plt.title('phi')
-        plt.axis([-1,1,-5,5])
-        plt.grid()        
+        title('phi')
+        axis([-1,1,-6,6])
+        grid()        
         
-        plt.show()
-        
+        show()
         
         for k in range(N):
             y[k] = self.phip(x[k]).T
 
-        plt.plot(x,y)
+        plot(x,y)
 
-        plt.axis([-1,1,-5,5])
-        plt.title('phip') 
-        plt.grid()   
+        axis([-1,1,-6,6])
+        title('phip') 
+        grid()   
         
-        plt.show()
+        show()

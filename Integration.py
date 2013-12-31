@@ -2,8 +2,6 @@ from Legendre import Legendre
 from numpy import abs
 
 class Integration:
-    
-    #ordre : degre des polynomes de la base
     def __init__(self,ordre):
         self.ordre = ordre
         
