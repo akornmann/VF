@@ -66,8 +66,6 @@ while(rk2.t<Tmax):
     
     anim.plot(y)
 
-from Integration import Integration
-integ = Integration(ordre)
 norme = 0
 for i in range(N):
     for j in range(ordre):
